@@ -4,8 +4,8 @@ import com.servicefuture.incidentservice.exception.NotFoundException;
 import com.servicefuture.incidentservice.model.Incident;
 import com.servicefuture.incidentservice.repository.IncidentRepository;
 import com.servicefuture.incidentservice.service.IncidentService;
+import com.servicefuture.incidentservice.utility.ObjectUtility;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Service;
 
 import java.util.Collection;
@@ -20,20 +20,27 @@ public class IncidentServiceImpl implements IncidentService {
     private IncidentRepository incidentRepository;
 
     @Override
-    public Long addIncident(Incident incident) {
-        return incidentRepository.save(incident).getId();
+    public Incident addIncident(Incident incident) {
+        return incidentRepository.save(incident);
     }
 
     @Override
-    public void updateIncident(Long incidentId, Incident incident) {
-        validateExistingIncident(incidentId);
+    public Incident updateIncident(Long incidentId, Incident incident) {
+        getIncident(incidentId);
         incident.setId(incidentId);
-        incidentRepository.save(incident);
+        return incidentRepository.save(incident);
+    }
+
+    @Override
+    public Incident patchIncident(Long incidentId, Incident incident) {
+        Incident existingIncident = getIncident(incidentId);
+        ObjectUtility.mergeObject(incident, existingIncident);
+        return incidentRepository.save(existingIncident);
     }
 
     @Override
     public void deleteIncident(Long incidentId) {
-        validateExistingIncident(incidentId);
+        getIncident(incidentId);
         incidentRepository.delete(incidentId);
     }
 
@@ -49,8 +56,4 @@ public class IncidentServiceImpl implements IncidentService {
         return incidentRepository.findAll();
     }
 
-    private void validateExistingIncident(Long incidentId){
-        Incident existingIncident = incidentRepository.findOne(incidentId);
-        if(existingIncident == null) throw new NotFoundException(incidentId.toString());
-    }
 }

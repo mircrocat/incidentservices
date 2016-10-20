@@ -8,8 +8,9 @@ import java.util.Collection;
  * Created by zhenjian on 2016/9/20.
  */
 public interface IncidentService {
-    Long addIncident(Incident incident);
-    void updateIncident(Long incidentId, Incident incident);
+    Incident addIncident(Incident incident);
+    Incident updateIncident(Long incidentId, Incident incident);
+    Incident patchIncident(Long incidentId, Incident incident);
     void deleteIncident(Long incidentId);
     Incident getIncident(Long incidentId);
     Collection<Incident> getIncidents();
